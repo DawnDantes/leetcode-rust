@@ -22,7 +22,8 @@ use futures::task::SpawnExt;
 use std::sync::{Arc, Mutex};
 
 /// main() helps to generate the submission template .rs
-fn main() {
+#[tokio::main]
+async fn main() {
     println!("Welcome to leetcode-rust system.\n");
     let mut initialized_ids = get_initialized_ids();
     loop {
