@@ -68,7 +68,7 @@ fn main() {
             // deal all problems
             let pool = ThreadPool::new().unwrap();
             let mut tasks = vec![];
-            let problems = fetcher::get_problems().unwrap();
+            let problems = block_on(fetcher::get_problems()).unwrap();
             let mut mod_file_addon = Arc::new(Mutex::new(vec![]));
             for problem_stat in problems.stat_status_pairs {
                 if initialized_ids.contains(&problem_stat.stat.frontend_question_id) {
@@ -125,7 +125,7 @@ fn main() {
             }
         }
 
-        let problem = fetcher::get_problem(id).unwrap_or_else(|| {
+        let problem = block_on(fetcher::get_problem(id)).unwrap_or_else(|| {
             panic!(
                 "Error: failed to get problem #{} \
                  (The problem may be paid-only or may not be exist).",
@@ -152,7 +152,7 @@ fn generate_random_id(except_ids: &[u32]) -> u32 {
     use std::fs;
     let mut rng = rand::thread_rng();
     loop {
-        let res: u32 = rng.gen_range(1, 1106);
+        let res: u32 = rng.gen_range(1..1106);
         if !except_ids.contains(&res) {
             return res;
         }
@@ -277,7 +277,7 @@ fn build_desc(content: &str) -> String {
 }
 
 fn deal_solving(id: &u32) {
-    let problem = fetcher::get_problem(*id).unwrap();
+    let problem = block_on(fetcher::get_problem(*id)).unwrap();
     let file_name = format!(
         "p{:04}_{}",
         problem.question_id,

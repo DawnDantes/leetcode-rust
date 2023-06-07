@@ -18,8 +18,8 @@ query questionData($titleSlug: String!) {
 }"#;
 const QUESTION_QUERY_OPERATION: &str = "questionData";
 
-pub fn get_problem(frontend_question_id: u32) -> Option<Problem> {
-    let problems = get_problems().unwrap();
+pub async fn get_problem(frontend_question_id: u32) -> Option<Problem> {
+    let problems = get_problems().await.unwrap();
     for problem in problems.stat_status_pairs.iter() {
         if problem.stat.frontend_question_id == frontend_question_id {
             if problem.paid_only {
@@ -33,8 +33,10 @@ pub fn get_problem(frontend_question_id: u32) -> Option<Problem> {
                     problem.stat.question_title_slug.as_ref().unwrap(),
                 ))
                 .send()
+                .await
                 .unwrap()
                 .json()
+                .await
                 .unwrap();
             return Some(Problem {
                 title: problem.stat.question_title.clone().unwrap(),
@@ -96,8 +98,8 @@ pub async fn get_problem_async(problem_stat: StatWithStatus) -> Option<Problem> 
     });
 }
 
-pub fn get_problems() -> Option<Problems> {
-    reqwest::get(PROBLEMS_URL).unwrap().json().unwrap()
+pub async fn get_problems() -> Option<Problems> {
+    reqwest::get(PROBLEMS_URL).await.unwrap().json().await.unwrap()
 }
 
 #[derive(Serialize, Deserialize)]
